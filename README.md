@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tele-Health Project
+
+This is a Tele-Health web application built with [Next.js](https://nextjs.org), designed to provide remote healthcare services. It features a user-friendly dashboard for managing appointments, health analyses, messages, and prescriptions.
+
+## Features
+- **User Authentication**: Secure login and registration for patients and healthcare providers.
+- **Appointment Scheduling**: Book, manage, and cancel appointments via a calendar interface (5 upcoming today).
+- **Patient Portal**: Access medical records, prescriptions, and health history.
+- **Secure Data Handling**: HIPAA-compliant with encryption and access controls.
+- **Responsive Design**: Optimized for desktop and mobile use.
+- **AI Integration**: AI health analyses and assistant support.
+- **Messaging**: Communicate with doctors.
 
 ## Getting Started
 
-First, run the development server:
+1. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd tele-health
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   # or
+   bun install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Run the Development Server**:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   # or
+   bun dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to view the dashboard.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. Edit the main page by modifying `app/page.tsx`. Changes auto-update.
 
-## Learn More
+## Usage
+- **Dashboard**: View upcoming appointments, recent AI analyses, messages, and prescriptions.
+- **Quick Actions**: Book appointments, run AI analyses, or message doctors.
+- **AI Assistant**: Access support via the "Try AI Assistant" button.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment
+Deploy on the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme). See [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing
+Submit issues or pull requests to the [project repository](#).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+MIT License
