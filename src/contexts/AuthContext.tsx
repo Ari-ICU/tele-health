@@ -85,13 +85,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         headers: { Authorization: `Bearer ${newToken}` },
       });
       const userData = response.data;
-
+      console.log('Login response:', response.data);
       // Check onboarding conditions
       if (!userData.profile.hasCompletedProfile || !userData.profile.hasAcceptedTerms) {
         localStorage.setItem('token', newToken);
         setUser(userData);
         setToken(newToken);
-        router.push('/onboarding');
+        router.push('/dashboard');
         return;
       }
 

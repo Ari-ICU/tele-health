@@ -75,3 +75,49 @@ export interface Activity {
   timestamp: string;
   relatedId?: string; // ID of Appointment, Message, AIAnalysis, or Prescription
 }
+
+export interface DoctorProfile {
+  specialty?: string;
+  licenseNumber?: string;
+  experience?: number;
+  rating?: number;
+  consultationFee?: number;
+  bio?: string;
+  verified?: boolean;
+}
+
+export interface Doctor extends User {
+  doctorProfile: DoctorProfile;
+}
+
+export interface HealthMetrics {
+  _id?: string;
+  height?: number;
+  weight?: number;
+  bloodPressure?: string;
+  heartRate?: number;
+  temperature?: number;
+  lastUpdated?: Date;
+}
+
+
+export interface MedicalRecord {
+  _id: string;
+  patient: User | { _id: string };
+  doctor?: User | { _id: string };
+  appointment?: string;
+  type: 'consultation' | 'test' | 'prescription' | 'report';
+  title?: string;
+  description?: string;
+  files?: Array<{
+    filename: string;
+    originalName: string;
+    mimetype: string;
+    size: number;
+    url: string;
+  }>;
+  tags?: string[];
+  isPrivate?: boolean;
+  createdAt: Date;
+  updatedAt?: Date;
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Doctor } from '@/types';
 
@@ -8,113 +9,173 @@ export default function DoctorsPage() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<{ id: string; name: string } | null>(
+    null
+  );
+  const router = useRouter();
+
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/doctors');
+      setDoctors(res.data);
+      setError(null);
+    } catch (err) {
+      setError('Could not load doctors. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get('/doctors');
-        setDoctors(res.data);
-      } catch (err) {
-        console.error('Failed to fetch doctors:', err);
-        setError('Could not load doctors. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDoctors();
   }, []);
 
-  const renderStars = (rating: number) => {
-    const fullStars = Math.floor(rating);
-    return Array(fullStars)
-      .fill(0)
-      .map((_, i) => <span key={i}>⭐</span>);
+  const handleDelete = async () => {
+    if (!deleteModal) return;
+    try {
+      await api.delete(`/doctors/${deleteModal.id}`);
+      fetchDoctors();
+      setDeleteModal(null);
+    } catch {
+      setError('Failed to delete doctor');
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
-          <p className="mt-4 text-gray-600">Loading doctors...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow max-w-md w-full text-center">
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen py-6 px-4 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center mb-12 text-gray-800">🏥 Find a Doctor</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-8">
+          🩺 Manage Doctors
+        </h1>
 
-        {doctors.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg">No doctors available at the moment.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {doctors.map((doctor) => (
-              <div
-                key={doctor._id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
-              >
-                {/* Header - Avatar + Name */}
-                <div className="p-6 border-b">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold text-2xl">
-                      {doctor.profile.firstName.charAt(0)}
-                      {doctor.profile.lastName.charAt(0)}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-800">
-                        Dr. {doctor.profile.firstName} {doctor.profile.lastName}
-                      </h2>
-                      <p className="text-sm text-gray-500">{doctor.doctorProfile.specialty}</p>
-                    </div>
-                  </div>
-                </div>
+        {/* Create Button */}
+        <div className="mb-6 flex justify-end">
+          <button
+            onClick={() => router.push('/doctors/create')}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 sm:px-4  rounded-lg shadow transition-transform duration-200 transform hover:scale-105"
+            aria-label="Create new doctor"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Create Doctor
+          </button>
+        </div>
 
-                {/* Body - Info */}
-                <div className="p-6 space-y-4">
-                  {/* Rating */}
-                  <div className="flex items-center gap-1 text-yellow-500 text-sm">
-                    {renderStars(doctor.doctorProfile.rating)}
-                    <span className="text-gray-600 ml-1 text-sm">
-                      ({doctor.doctorProfile.rating.toFixed(1)} / 5)
-                    </span>
-                  </div>
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6 animate-bounce">
+            <p>{error}</p>
+          </div>
+        )}
 
-                  {/* Fee */}
-                  <p className="text-lg font-semibold text-gray-700">
-                    💵 ${doctor.doctorProfile.consultationFee} per consultation
-                  </p>
-
-                  {/* Location (Optional) */}
-                  {doctor.doctorProfile.hospital && (
-                    <p className="text-sm text-gray-500 mt-2 line-clamp-1">
-                      🏥 {doctor.doctorProfile.hospital}
-                    </p>
-                  )}
-                </div>
-
-                {/* Footer - Action Button */}
-                <div className="p-6 border-t bg-gray-50">
-                  <button className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-medium py-2 px-4 rounded-lg hover:from-green-600 hover:to-teal-600 transition-colors shadow-sm hover:shadow focus:outline-none">
-                    Book Appointment
-                  </button>
-                </div>
-              </div>
+        {/* Loading Skeleton */}
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded animate-pulse"></div>
             ))}
+          </div>
+        ) : doctors.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-600">No doctors found.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto bg-white shadow rounded-lg overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Specialty
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Fee
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {doctors.map((doctor) => (
+                  <tr
+                    key={doctor._id}
+                    className="hover:bg-gray-50 transition-colors duration-150"
+                  >
+                    <td className="px-4 py-4 whitespace-nowrap text-sm sm:text-base font-medium text-gray-900">
+                      Dr. {doctor.profile.firstName} {doctor.profile.lastName}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 hidden md:table-cell">
+                      {doctor.doctorProfile.specialty}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600">
+                      ${doctor.doctorProfile.consultationFee}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-right space-x-2">
+                      <button
+                        onClick={() => router.push(`/doctors/${doctor._id}/edit`)}
+                        className="text-blue-600 hover:text-blue-800 font-medium transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          setDeleteModal({
+                            id: doctor._id,
+                            name: `${doctor.profile.firstName} ${doctor.profile.lastName}`,
+                          })
+                        }
+                        className="text-red-600 hover:text-red-800 font-medium transition"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {deleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full animate-fade-in">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Confirm Deletion</h2>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete{' '}
+                <span className="font-semibold">Dr. {deleteModal.name}</span>? This action cannot be undone.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setDeleteModal(null)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
